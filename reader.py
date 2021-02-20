@@ -14,7 +14,7 @@ from telepot.delegate import pave_event_space, per_chat_id, create_open, \
     include_callback_query_chat_id, per_inline_from_id
 
 
-TOKEN= "1113817716:AAGjlPbMvLTBn-BIF5SFnujqDbQA0qVzgfo"
+TOKEN= "1113817716:AA"
 
 def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
