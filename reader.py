@@ -20,35 +20,34 @@ def on_chat_message(msg):
     content_type, chat_type, chat_id = telepot.glance(msg)
     group_id = chat_id
 
-    if (content_type == 'text'):
-        if (msg['text'][:6] == '/manga'):
-            chat_id = msg['from']['id']
-            if((msg['text'].lower()=='/manga') or ((msg['text'].lower()[:6]=='/manga')
-                                                                     and (msg['text'][-13:]=='@Mangakyo_bot'))):
-                bot.sendMessage(chat_id,"/manga <enter short name of the manga and wait for our message>")
+    if (content_type == 'text') and (msg['text'][:6] == '/manga'):
+        chat_id = msg['from']['id']
+        if((msg['text'].lower()=='/manga') or ((msg['text'].lower()[:6]=='/manga')
+                                                                 and (msg['text'][-13:]=='@Mangakyo_bot'))):
+            bot.sendMessage(chat_id,"/manga <enter short name of the manga and wait for our message>")
 
-            elif(msg['text'][:19] == '/manga@Mangakyo_bot'):
-                bot.sendMessage(group_id, "/manga <enter short name of the manga without the bot name>")
+        elif(msg['text'][:19] == '/manga@Mangakyo_bot'):
+            bot.sendMessage(group_id, "/manga <enter short name of the manga without the bot name>")
 
-            else:
-                url1 = 'https://www.mangareader.net/search/?nsearch=' + str("+".join(msg['text'][7:].lower().split())) + '&msearch='
-                r = requests.get(url1 , headers={'User-Agent': 'Mozilla/5.0'})
-                page_soup = soup(r.content, 'html.parser')
-                title = page_soup.find_all('div', class_ = 'd57')
-                inl=[]
-                for i in range(len(title)):
-                    href = (title[i].find('a').attrs['href'])
-                    title[i] = title[i].getText()
+        else:
+            url1 = 'https://www.mangareader.net/search/?nsearch=' + str("+".join(msg['text'][7:].lower().split())) + '&msearch='
+            r = requests.get(url1 , headers={'User-Agent': 'Mozilla/5.0'})
+            page_soup = soup(r.content, 'html.parser')
+            title = page_soup.find_all('div', class_ = 'd57')
+            inl=[]
+            for i in range(len(title)):
+                href = (title[i].find('a').attrs['href'])
+                title[i] = title[i].getText()
 
-                    if (len(href)>58):
-                        inl.append([InlineKeyboardButton(text=str(title[i])[:18] + "....."+ str(title[i])[-18:], url="https://mangareader.net"+str(href))])
-                    else:
-                        inl.append([InlineKeyboardButton(text=str(title[i]), parse_mode='Markdown', callback_data=(href + "abo"))])
-                if('username' in msg['from']):
-                    bot.sendMessage('1152801694', msg['text'] +" "+ msg['from']['first_name']+" @" + msg['from']['username'])
+                if (len(href)>58):
+                    inl.append([InlineKeyboardButton(text=str(title[i])[:18] + "....."+ str(title[i])[-18:], url="https://mangareader.net"+str(href))])
                 else:
-                    bot.sendMessage('1152801694', msg['text'] +" "+ msg['from']['first_name'])
-                bot.sendMessage(group_id,"RESULTS (make sure to DM the bot once to enable reading capabilities)",reply_markup = InlineKeyboardMarkup(inline_keyboard=inl))
+                    inl.append([InlineKeyboardButton(text=str(title[i]), parse_mode='Markdown', callback_data=(href + "abo"))])
+            if('username' in msg['from']):
+                bot.sendMessage('1152801694', msg['text'] +" "+ msg['from']['first_name']+" @" + msg['from']['username'])
+            else:
+                bot.sendMessage('1152801694', msg['text'] +" "+ msg['from']['first_name'])
+            bot.sendMessage(group_id,"RESULTS (make sure to DM the bot once to enable reading capabilities)",reply_markup = InlineKeyboardMarkup(inline_keyboard=inl))
 
 def on_callback_query(msg):
     query_id, chat_id, query_data = telepot.glance(msg, flavor='callback_query')
